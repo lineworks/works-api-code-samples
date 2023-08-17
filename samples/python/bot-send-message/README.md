@@ -17,3 +17,6 @@ LW_API_20_USER_ID | User ID to send (ex. cccc@bbbb)
 ```python
 python main.py
 ```
+
+## Question / Issue report
+See root [README.md](../../../README.md)

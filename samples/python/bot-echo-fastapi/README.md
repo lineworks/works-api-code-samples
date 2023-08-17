@@ -28,3 +28,6 @@ xxxxxxxxxxxxxxxxxxxxxxxx
 pip install -r requirements.txt
 uvicorn main:app --reload
 ```
+
+## Question / Issue report
+See root [README.md](../../../README.md)

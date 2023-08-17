@@ -32,3 +32,6 @@ xxxxxxxxxxxxxxxxxxxxxxxx
 npm install
 node index.js
 ```
+
+## Question / Issue report
+See root [README.md](../../../README.md)
