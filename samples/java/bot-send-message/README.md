@@ -1,2 +1,0 @@
-# Send message sample - Java
-

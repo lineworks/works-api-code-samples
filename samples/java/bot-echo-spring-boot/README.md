@@ -31,5 +31,5 @@ Run using Gradle with API parameters
 
 or, edit each parameter in [application.properties](./src/main/resources/application.properties) file and run.
 
-## License, Help, and Contribution
-See root [README.md](../../../README.md))
+## Question / Issue report
+See root [README.md](../../../README.md)
