@@ -15,7 +15,7 @@ LINE WORKS API や Bot を利用したアプリケーションのサンプルコ
 
 
 ## Question / Issue / Requests
-サンプルコードに関する質問・ディスカッションは、[Github Discussions](/discussions) に投稿してください。
+サンプルコードに関する質問・ディスカッションは、[Github Discussions](https://github.com/lineworks/works-api-code-samples/discussions) に投稿してください。
 
 その他、API・Bot に関するディスカッションは、LINE WORKS Developers Community をご活用ください。
 Developers Community : https://forum.worksmobile.com/jp/

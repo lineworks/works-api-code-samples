@@ -16,7 +16,7 @@ A collection of sample code for applications using the WORKS API / Bot.
 
 
 ## Question / Issue / Requests
-Please post questions and discussions about the sample code to [Github Discussions](/discussions).
+Please post questions and discussions about the sample code to [Github Discussions](https://github.com/lineworks/works-api-code-samples/discussions).
 
 Please use the LINE WORKS Developers Community for discussions on API / Bot.
 Developers Community : https://forum.worksmobile.com/
