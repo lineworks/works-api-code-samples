@@ -1,5 +1,12 @@
 package com.example.echobot;
 
+import com.example.echobot.worksapi.WorksApi;
+import com.example.echobot.worksapi.WorksApiModel;
+import com.example.echobot.worksapi.exception.WorksApiUnauthorizedException;
+import com.example.echobot.worksapi.exception.WorksApiBadRequestException;
+import com.example.echobot.worksapi.exception.WorksApiOverRateLimitException;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -51,8 +58,23 @@ public class EchobotController {
     private Logger logger = LoggerFactory.getLogger(EchobotController.class);
     private WorksApiParameters worksApiParameters;
 
+    @Autowired
+    private SharedMemory sharedMemory;
+
     public EchobotController(WorksApiParameters worksApiParameters) {
         this.worksApiParameters = worksApiParameters;
+    }
+
+    private String getAccessToken() throws WorksApiBadRequestException {
+        String accessToken = WorksApi.getAccessToken(
+                worksApiParameters.clientId(),
+                worksApiParameters.clientSecret(),
+                worksApiParameters.serviceAccount(),
+                worksApiParameters.privateKey(),
+                "bot"
+                );
+        sharedMemory.put("access_token", accessToken);
+        return accessToken;
     }
 
     @GetMapping("/")
@@ -88,58 +110,51 @@ public class EchobotController {
         }
 
         // Mapping
-        WorksApi.Event event = WorksApi.convertToEvent(eventBody);
+        WorksApiModel.Event event = WorksApi.convertToEvent(eventBody);
         if (event == null) {
             return ResponseEntity.badRequest().body(null);
         }
 
         // Get Access Token
-        // TODO:InMemory
-        String accessToken = null;
-        try {
-            accessToken = WorksApi.getAccessToken(
-                    worksApiParameters.clientId(),
-                    worksApiParameters.clientSecret(),
-                    worksApiParameters.serviceAccount(),
-                    worksApiParameters.privateKey(),
-                    "bot"
-                    );
-        } catch (IOException e) {
-            logger.error(e.getMessage());
-            return ResponseEntity.badRequest().body(null);
+        String accessToken = sharedMemory.get("access_token");
+        if (accessToken == null) {
+            logger.info("Refrech access token");
+            try {
+                accessToken = getAccessToken();
+            } catch (WorksApiBadRequestException e) {
+                logger.error(e.getMessage());
+                return ResponseEntity.badRequest().body(null);
+            }
+        } else {
+            logger.info("Use cache of access token");
         }
 
-        if (accessToken == null) {
-            logger.warn("Access Token is null.");
-            return ResponseEntity.badRequest().body(null);
-        }
-        logger.info(accessToken);
 
         // Handle event
-        if (event instanceof WorksApi.MessageEvent messageEvent) {
+        if (event instanceof WorksApiModel.MessageEvent messageEvent) {
             logger.info(String.format("%s", messageEvent.content()));
 
-            WorksApi.MessageContent messageContent = messageEvent.content();
-            WorksApi.EventSource eventSource = messageEvent.source();
+            WorksApiModel.MessageContent messageContent = messageEvent.content();
+            WorksApiModel.EventSource eventSource = messageEvent.source();
             String userId = eventSource.userId();
 
-            WorksApi.MessageRequest messageRequest = null;
+            WorksApiModel.MessageRequest messageRequest = null;
 
-            if (messageContent instanceof WorksApi.TextMessageContent textMessage) {
+            if (messageContent instanceof WorksApiModel.TextMessageContent textMessage) {
                 logger.info("text");
-                messageRequest = new WorksApi.MessageRequest(textMessage);
-            } else if (messageContent instanceof WorksApi.StickerMessageContent stickerMessage) {
+                messageRequest = new WorksApiModel.MessageRequest(textMessage);
+            } else if (messageContent instanceof WorksApiModel.StickerMessageContent stickerMessage) {
                 logger.info("sticker");
-                messageRequest = new WorksApi.MessageRequest(stickerMessage);
-            } else if (messageContent instanceof WorksApi.LocationMessageContent locationMessage) {
+                messageRequest = new WorksApiModel.MessageRequest(stickerMessage);
+            } else if (messageContent instanceof WorksApiModel.LocationMessageContent locationMessage) {
                 logger.info("location");
-                messageRequest = new WorksApi.MessageRequest(new WorksApi.TextMessageContent("text", locationMessage.toString()));
-            } else if (messageContent instanceof WorksApi.ImageMessageContent imageMessage) {
+                messageRequest = new WorksApiModel.MessageRequest(new WorksApiModel.TextMessageContent("text", locationMessage.address()));
+            } else if (messageContent instanceof WorksApiModel.ImageMessageContent imageMessage) {
                 logger.info("image");
-                messageRequest = new WorksApi.MessageRequest(imageMessage);
-            } else if (messageContent instanceof WorksApi.FileMessageContent fileMessage) {
+                messageRequest = new WorksApiModel.MessageRequest(imageMessage);
+            } else if (messageContent instanceof WorksApiModel.FileMessageContent fileMessage) {
                 logger.info("file");
-                messageRequest = new WorksApi.MessageRequest(fileMessage);
+                messageRequest = new WorksApiModel.MessageRequest(fileMessage);
             }
 
             if (messageRequest == null) {
@@ -148,13 +163,29 @@ public class EchobotController {
             }
 
             // send message
-            try {
-                logger.info(String.format("Send message: %s", messageRequest));
-                WorksApi.sendMessageToUser(messageRequest, botIdHeader, userId, accessToken);
-            } catch (IOException e) {
-                // TODO:retry
-                logger.error(e.getMessage());
-                return ResponseEntity.badRequest().body(null);
+            for (int attempt = 0; attempt < 2; attempt++) {
+                try {
+                    logger.info(String.format("Send message: %s", messageRequest));
+                    WorksApi.sendMessageToUser(messageRequest, botIdHeader, userId, accessToken);
+                    break;
+                } catch (WorksApiUnauthorizedException e) {
+                    // Access Token has been exipred
+                    // Update
+                    logger.info("Refrech access token");
+                    try {
+                        accessToken = getAccessToken();
+                    } catch (WorksApiBadRequestException er) {
+                        logger.error(er.getMessage());
+                        return ResponseEntity.badRequest().body(null);
+                    }
+                } catch (WorksApiBadRequestException e) {
+                    logger.error(e.getMessage());
+                    return ResponseEntity.badRequest().body(null);
+                } catch (WorksApiOverRateLimitException e) {
+                    logger.error(e.getMessage());
+                    return ResponseEntity.badRequest().body(null);
+                }
+                logger.info("Retry");
             }
 
             logger.info("done");
@@ -166,4 +197,3 @@ public class EchobotController {
         return ResponseEntity.ok(null);
     }
 }
-
