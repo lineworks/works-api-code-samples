@@ -1,24 +1,23 @@
 # Echo bot sample - Spring boot
+Sample bot application based on Spring Boot.
 
-## Library
-https://github.com/auth0/java-jwt
+## Using libraries
+- https://spring.io/projects/spring-boot
+- https://github.com/auth0/java-jwt
+- https://github.com/square/okhttp
 
-## Prepare
+See [build.gradle](./build.gradle)
+
+## Usage
+### Workspace with Docker
 
 ```sh
 docker compose up -d
 docker compose exec workspace bash
 ```
 
-## Build
-
-```sh
-./gradlew build
-```
-
 ## Run
-
-Run with API parameters
+Run using Gradle with API parameters
 
 ```sh
 ./gradlew bootRun \
@@ -30,4 +29,7 @@ Run with API parameters
     -Dworks.api.private-key==PRIVATE_KEY
 ```
 
-or, edit each parameter in `application.properties` file and run.
+or, edit each parameter in [application.properties](./src/main/resources/application.properties) file and run.
+
+## License, Help, and Contribution
+See root [README.md](../../../README.md))
