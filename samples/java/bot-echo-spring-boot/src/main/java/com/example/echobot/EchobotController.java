@@ -45,11 +45,6 @@ public class EchobotController {
         return accessToken;
     }
 
-    @GetMapping("/")
-    public String hello(@RequestParam(value = "name", defaultValue = "World") String name) {
-      return String.format("Hello %s!", name);
-    }
-
     @PostMapping(path="/callback", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<String> callback(
             @RequestBody String eventBody,
