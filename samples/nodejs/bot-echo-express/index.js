@@ -68,7 +68,7 @@ app.post('/callback', verifyBody, async (req, res, next) => {
             if (error.response) {
                 const errStatus = error.response.status
                 const errBody = error.response.data
-                if (errStatus == 403) {
+                if (errStatus == 401) {
                     if (errBody["code"] == "UNAUTHORIZED") {
                         // Get access token
                         console.debug("Update access token")

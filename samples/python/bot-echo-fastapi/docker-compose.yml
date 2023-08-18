@@ -2,13 +2,13 @@ version: "3.0"
 
 services:
   workspace:
-    image: eclipse-temurin:17
+    image: python:3.9
     tty: true
     volumes:
       - .:/app
     working_dir: /app
     ports:
-      - "8080:8080"
+      - "8000:8000"
     environment:
       - 'PS1=[\u@\h \W] \$$ '
       - LW_API_BOT_ID
