@@ -21,8 +21,8 @@ LINE WORKS API や Bot を利用したアプリケーションのサンプルコ
 Developers Community : https://forum.worksmobile.com/jp/
 
 ## Media
-Doc: https://developers.worksmobile.com/jp/docs
-News: https://developers.worksmobile.com/jp/news
+- Doc: https://developers.worksmobile.com/jp/docs
+- News: https://developers.worksmobile.com/jp/news
 
 ## License
 [Unlicense license](LINCENSE)

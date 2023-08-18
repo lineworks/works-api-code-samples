@@ -22,8 +22,8 @@ Please use the LINE WORKS Developers Community for discussions on API / Bot.
 Developers Community : https://forum.worksmobile.com/
 
 ## Media
-Doc: https://developers.worksmobile.com/docs
-News: https://developers.worksmobile.com/news
+- Doc: https://developers.worksmobile.com/docs
+- News: https://developers.worksmobile.com/news
 
 ## License
 [Unlicense license](LINCENSE)
