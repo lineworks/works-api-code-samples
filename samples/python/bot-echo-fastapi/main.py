@@ -85,7 +85,7 @@ async def callback(request: Request):
         except RequestException as e:
             body = e.response.json()
             status_code = e.response.status_code
-            if status_code == 403:
+            if status_code == 401:
                 if body["code"] == "UNAUTHORIZED":
                     # Access Token has been expired.
                     # Update Access Token

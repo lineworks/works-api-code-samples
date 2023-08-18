@@ -195,7 +195,7 @@ public class WorksApi {
                 statusCode = response.code();
                 if (isSuccess) {
                     break;
-                } else if (statusCode == 403) {
+                } else if (statusCode == 401) {
                     try {
                         WorksApiModel.ErrorResponse err = WorksApiModel.JsonToObject(resJson, WorksApiModel.ErrorResponse.class);
                         if (err.code() == "UNAUTHORIZED")
